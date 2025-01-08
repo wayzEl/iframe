@@ -3,50 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat Frame</title>
+    <title>Chatbot</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f9f9f9;
+        /* Floating button styles */
+        #floating-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background-color: #1e90ff; /* Default color */
+            border-radius: 50%; /* Circular button */
+            border: none;
+            outline: none;
+            cursor: pointer;
+            z-index: 9999;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.3s ease, background-color 0.3s ease;
         }
 
-        #content {
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            background: #fff;
+        #floating-button img {
+            transition: width 0.3s ease, height 0.3s ease; /* Smooth resizing */
         }
 
-        .dynamic-value {
-            font-weight: bold;
-            color: #1e90ff;
+        #floating-button:hover {
+            transform: scale(1.1); /* Slight zoom effect */
+        }
+
+        /* Iframe container styles */
+        #iframe-container {
+            display: none;
+            position: fixed;
+            bottom: 90px; /* Adjusted for spacing */
+            right: 20px;
+            width: 450px;
+            height: 75%;
+            z-index: 9998;
+            border-radius: 20px; /* Rounded corners */
+            overflow: hidden; /* Ensures no content spills out */
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Stronger shadow */
+            transform: translateY(10px); /* Start slightly off-screen */
+            transition: opacity 0.3s ease, transform 0.3s ease; /* Smooth opening */
+            opacity: 0; /* Hidden by default */
+        }
+
+        #iframe-container.active {
+            display: block;
+            opacity: 1; /* Make visible */
+            transform: translateY(0); /* Reset offset */
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 600px) {
+            #iframe-container {
+                width: 90%;
+                height: 90%;
+                bottom: 5%;
+                right: 5%;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>Dynamic Chat Frame</h1>
-    <div id="content">
-        <p>User ID: <span class="dynamic-value" id="user-id">Not Provided</span></p>
-        <p>Theme: <span class="dynamic-value" id="theme">Default</span></p>
+    <!-- Floating button -->
+    <button id="floating-button">
+        <img id="button-icon" src="https://d9f71de2656853ba771fb624c9394e98.cdn.bubble.io/f1736339148181x681070298425156500/chat.png" alt="Chat Icon" style="width: 30px; height: 30px;">
+    </button>
+
+    <!-- Iframe container -->
+    <div id="iframe-container">
+        <iframe 
+            id="chat-iframe"
+            src=""
+            style="height: 100%; width: 100%; border: none; display: block;">
+        </iframe>
     </div>
 
+    <!-- Script for toggle behavior and dynamic parameters -->
     <script>
-        // Parse URL Query Parameters
+        // Parse URL query parameters
         const urlParams = new URLSearchParams(window.location.search);
-        const userId = urlParams.get("user") || "Not Provided";
-        const theme = urlParams.get("theme") || "Default";
+        const projectID = urlParams.get("ProjectID") || "DefaultProjectID"; // Fallback to default if not provided
+        const buttonColor = urlParams.get("buttonColor") || "#1e90ff"; // Fallback to default color
 
-        // Update the content dynamically
-        document.getElementById("user-id").textContent = userId;
-        document.getElementById("theme").textContent = theme;
+        // DOM elements
+        const button = document.getElementById("floating-button");
+        const buttonIcon = document.getElementById("button-icon");
+        const iframeContainer = document.getElementById("iframe-container");
+        const chatIframe = document.getElementById("chat-iframe");
 
-        // Optional: Apply theme dynamically (example)
-        if (theme === "dark") {
-            document.body.style.backgroundColor = "#333";
-            document.body.style.color = "#fff";
-        }
+        // Apply dynamic values
+        button.style.backgroundColor = buttonColor; // Set button color dynamically
+        chatIframe.src = `https://leadcave.io/version-41s85/chat?Project%20ID=${projectID}`; // Update iframe source dynamically
+
+        // Toggle iframe visibility
+        button.addEventListener("click", function() {
+            if (iframeContainer.classList.contains("active")) {
+                iframeContainer.classList.remove("active");
+                setTimeout(() => { iframeContainer.style.display = "none"; }, 300); // Smooth hide
+                buttonIcon.src = "https://d9f71de2656853ba771fb624c9394e98.cdn.bubble.io/f1736339148181x681070298425156500/chat.png";
+                buttonIcon.style.width = "30px"; // Reset size to original chat icon
+                buttonIcon.style.height = "30px";
+            } else {
+                iframeContainer.style.display = "block";
+                setTimeout(() => { iframeContainer.classList.add("active"); }, 10); // Smooth show
+                buttonIcon.src = "https://d9f71de2656853ba771fb624c9394e98.cdn.bubble.io/f1736339290192x105811289847923310/close%20%281%29.png";
+                buttonIcon.style.width = "15px"; // Reduce size for close icon
+                buttonIcon.style.height = "15px";
+            }
+        });
     </script>
 </body>
 </html>
